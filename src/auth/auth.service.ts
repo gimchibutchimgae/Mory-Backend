@@ -1,9 +1,15 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtService } from '@nestjs/jwt';
 import { User } from './entity/user.entity';
 import { Payload } from './security/payload.interface';
-import { LoginUserDTO } from './dto/user.dto';
+import { CreateUserDTO, LoginUserDTO, OAuthDTO } from './dto/user.dto';
 import * as jwt from 'jsonwebtoken';
 
 @Injectable()
@@ -22,13 +28,25 @@ export class AuthService {
     };
   }
 
+  async register(createDto: CreateUserDTO) {
+    const existUser = await this.userService.findOne({
+      email: createDto.email,
+    });
+    if (existUser) throw new ConflictException('이미 존재하는 이메일 입니다.');
+    const user = await this.userService.create(createDto);
+    if (!user)
+      throw new InternalServerErrorException(
+        '계정을 생성하는 과정에서 알 수 없는 오류가 발생하였습니다. 관리자에게 문의하세요.',
+      );
+    return user;
+  }
+
+  //SECTION - vaildate
   async vaildateUser(loginDto: LoginUserDTO) {
     const user = await this.userService.findOne({ email: loginDto.email });
     // 이메일 존재 X
-    console.log(loginDto);
-    console.log(user);
     if (!user)
-      throw new BadRequestException(
+      throw new UnauthorizedException(
         '이메일 또는 비밀번호가 옳바르지 않습니다.',
       );
     // 비밀번호 매칭 X
@@ -37,7 +55,7 @@ export class AuthService {
       user,
     );
     if (!isCorrectPassword)
-      throw new BadRequestException(
+      throw new UnauthorizedException(
         '이메일 또는 비밀번호가 옳바르지 않습니다.',
       );
     // JWT 발급
@@ -54,5 +72,16 @@ export class AuthService {
     } catch {
       return false;
     }
+  }
+
+  vaildateOAuth(oauthDto: OAuthDTO, user: User) {
+    if (user.provider !== oauthDto.provider) {
+      throw new BadRequestException('인증 서비스가 옳바르지 않습니다.');
+    }
+    // JWT 발급
+    const payload = this.userToPayload(user);
+    return {
+      accessToken: this.jwtService.sign(payload),
+    };
   }
 }
