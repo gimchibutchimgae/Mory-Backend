@@ -2,12 +2,15 @@ import {
   BadRequestException,
   Body,
   Controller,
-  Get,
   Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserService } from './user.service';
 import { LoginUserDTO } from './dto/user.dto';
+import { LoginGuard } from './security/auth.guard';
+import { Request } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -16,14 +19,10 @@ export class AuthController {
     private authService: AuthService,
   ) {}
 
-  @Get('test')
-  async test() {
-    await this.userService.create({
-      name: 'guest',
-      email: 'guest',
-      password: 'guest',
-    });
-    return;
+  @Post('test')
+  @UseGuards(LoginGuard)
+  test(@Req() req: Request) {
+    return req.user;
   }
 
   @Post('login')

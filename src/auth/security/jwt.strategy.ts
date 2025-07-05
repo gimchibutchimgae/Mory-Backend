@@ -1,6 +1,6 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { ExtractJwt, Strategy, VerifiedCallback } from 'passport-jwt';
+import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Payload } from './payload.interface';
 import { UserService } from '../user.service';
 
@@ -14,14 +14,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: Payload, done: VerifiedCallback) {
-    const user = await this.userService.findByPayload(payload);
-    if (!user) {
-      return done(
-        new UnauthorizedException({ message: 'user does not exist' }),
-        false,
-      );
-    }
-    return done(null, user);
+  validate(payload: Payload) {
+    return payload;
   }
 }
