@@ -24,7 +24,7 @@ export class User {
   @Column()
   password: string;
 
-  @Column({ type: 'enum', enum: Provider, default: Provider.GOOGLE })
+  @Column({ type: 'enum', enum: Provider, default: Provider.LOCAL })
   provider: Provider;
 
   @Column({ type: 'enum', enum: Role, default: Role.USER })
