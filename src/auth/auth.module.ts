@@ -20,7 +20,7 @@ import { MoryModule } from 'src/mory/mory.module';
     }),
     MoryModule,
   ],
-  exports: [JwtModule],
+  exports: [JwtModule, UserService],
   controllers: [AuthController],
   providers: [AuthService, UserService, JwtStrategy, GoogleStrategy],
 })

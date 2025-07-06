@@ -1,8 +1,10 @@
+import { Diary } from 'src/diary/entity/diary.entity';
 import { Mory } from 'src/mory/entity/mory.entity';
 import {
   Column,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -43,4 +45,8 @@ export class User {
   @OneToOne(() => Mory, (mory) => mory.user)
   @JoinColumn()
   mory: Mory;
+
+  @OneToMany(() => Diary, (diary) => diary.user)
+  @JoinColumn()
+  diaries: Diary[];
 }

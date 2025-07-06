@@ -5,8 +5,9 @@ import { User } from './entity/user.entity';
 import { CreateUserDTO, InitUserDTO, UpdateUserDTO } from './dto/user.dto';
 import * as bcrypt from 'bcrypt';
 import { Payload } from './security/payload.interface';
+import { Diary } from 'src/diary/entity/diary.entity';
 
-const relations = [];
+const relations = ['diaries'];
 
 @Injectable()
 export class UserService {
@@ -46,6 +47,11 @@ export class UserService {
 
   async delete(id: number) {
     return await this.userRepo.delete(id);
+  }
+
+  async appendDiary(user: User, diary: Diary) {
+    user.diaries.push(diary);
+    return this.userRepo.save(user);
   }
 
   //SECTION - crpyto

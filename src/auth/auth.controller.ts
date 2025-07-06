@@ -38,6 +38,12 @@ export class AuthController {
     return req.user;
   }
 
+  @Get('tt')
+  @UseGuards(LoginGuard)
+  async testt(@Req() req: Request) {
+    return (await this.userService.getById((req.user as Payload).id)).diaries;
+  }
+
   @Post('login')
   async login(@Body() loginDto: LoginUserDTO): Promise<TokenResponse> {
     if (!loginDto.email || !loginDto.password)
