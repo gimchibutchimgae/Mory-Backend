@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { IsNotEmpty } from 'class-validator';
 import { Provider } from '../entity/user.entity';
+import { Mory } from 'src/mory/entity/mory.entity';
 
 export class CreateUserDTO {
   @IsNotEmpty()
@@ -26,4 +27,8 @@ export interface OAuthDTO {
   email: string;
   name: string;
   provider: Provider;
+}
+
+export interface InitUserDTO {
+  mory: Mory;
 }

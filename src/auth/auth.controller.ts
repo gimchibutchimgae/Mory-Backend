@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Post,
   Req,
@@ -13,6 +14,7 @@ import { CreateUserDTO, LoginUserDTO, OAuthDTO } from './dto/user.dto';
 import { LoginGuard } from './security/auth.guard';
 import { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
+import { Payload } from './security/payload.interface';
 
 interface TokenResponse {
   accessToken: string;
@@ -48,6 +50,12 @@ export class AuthController {
   @Post('register')
   async register(@Body() createDto: CreateUserDTO) {
     return await this.authService.register(createDto);
+  }
+
+  @Delete('me')
+  @UseGuards(LoginGuard)
+  async deleteMe(@Req() req: Request) {
+    return await this.authService.deleteByPayload(req.user as Payload);
   }
 
   //SECTION - OAuth 2.0

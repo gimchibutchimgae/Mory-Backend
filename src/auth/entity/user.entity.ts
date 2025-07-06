@@ -1,4 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Mory } from 'src/mory/entity/mory.entity';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 export enum Role {
   USER = 'user',
@@ -24,9 +31,16 @@ export class User {
   @Column()
   password: string;
 
+  @Column({ default: 'EN' })
+  mbti: string;
+
   @Column({ type: 'enum', enum: Provider, default: Provider.LOCAL })
   provider: Provider;
 
   @Column({ type: 'enum', enum: Role, default: Role.USER })
   role: Role;
+
+  @OneToOne(() => Mory, (mory) => mory.user)
+  @JoinColumn()
+  mory: Mory;
 }

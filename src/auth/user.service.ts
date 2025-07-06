@@ -2,11 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entity/user.entity';
-import { CreateUserDTO, UpdateUserDTO } from './dto/user.dto';
+import { CreateUserDTO, InitUserDTO, UpdateUserDTO } from './dto/user.dto';
 import * as bcrypt from 'bcrypt';
 import { Payload } from './security/payload.interface';
 
-type ReturnEntity = User | null;
 const relations = [];
 
 @Injectable()
@@ -30,16 +29,26 @@ export class UserService {
     return user;
   }
 
-  async create(createDto: CreateUserDTO): Promise<ReturnEntity> {
+  async create(createDto: CreateUserDTO): Promise<User> {
     await this.encryptPassword(createDto);
     return await this.userRepo.save(createDto);
   }
 
-  async update(updateDto: UpdateUserDTO): Promise<ReturnEntity> {
+  async init(user: User, initDto: InitUserDTO) {
+    user.mory = initDto.mory;
+    return await this.userRepo.save(user);
+  }
+
+  async update(updateDto: UpdateUserDTO): Promise<User> {
     // pwd 업데이트 필요시 암호화
     return await this.userRepo.save(updateDto);
   }
 
+  async delete(id: number) {
+    return await this.userRepo.delete(id);
+  }
+
+  //SECTION - crpyto
   async encryptPassword(userDto: CreateUserDTO) {
     userDto.password = await this.encrypt(userDto.password);
   }

@@ -11,11 +11,13 @@ import { User } from './entity/user.entity';
 import { Payload } from './security/payload.interface';
 import { CreateUserDTO, LoginUserDTO, OAuthDTO } from './dto/user.dto';
 import * as jwt from 'jsonwebtoken';
+import { MoryService } from 'src/mory/mory.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UserService,
+    private moryService: MoryService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -33,12 +35,20 @@ export class AuthService {
       email: createDto.email,
     });
     if (existUser) throw new ConflictException('이미 존재하는 이메일 입니다.');
+    // 계정 생성
     const user = await this.userService.create(createDto);
     if (!user)
       throw new InternalServerErrorException(
         '계정을 생성하는 과정에서 알 수 없는 오류가 발생하였습니다. 관리자에게 문의하세요.',
       );
+    // User Entity 의존성 관련
+    const mory = await this.moryService.create(user);
+    await this.userService.init(user, { mory });
     return user;
+  }
+
+  async deleteByPayload(payload: Payload) {
+    return await this.userService.delete(payload.id);
   }
 
   //SECTION - vaildate
