@@ -8,6 +8,8 @@ import { MoryModule } from './mory/mory.module';
 import { Mory } from './mory/entity/mory.entity';
 import { DiaryModule } from './diary/diary.module';
 import { Diary } from './diary/entity/diary.entity';
+import { AnalysisModule } from './analysis/analysis.module';
+import { Analysis } from './analysis/entity/analysis.entity';
 
 @Module({
   imports: [
@@ -18,12 +20,13 @@ import { Diary } from './diary/entity/diary.entity';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [User, Mory, Diary],
+      entities: [User, Mory, Diary, Analysis],
       synchronize: true,
     }),
     AuthModule,
     MoryModule,
     DiaryModule,
+    AnalysisModule,
   ],
   controllers: [AppController],
   providers: [AppService],

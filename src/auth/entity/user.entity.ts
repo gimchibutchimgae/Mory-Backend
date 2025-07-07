@@ -47,6 +47,5 @@ export class User {
   mory: Mory;
 
   @OneToMany(() => Diary, (diary) => diary.user)
-  @JoinColumn()
   diaries: Diary[];
 }

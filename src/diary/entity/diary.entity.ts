@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { IsInt, Max, Min } from 'class-validator';
+import { Analysis } from 'src/analysis/entity/analysis.entity';
 import { User } from 'src/auth/entity/user.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -43,4 +45,7 @@ export class Diary {
 
   @ManyToOne(() => User, (user) => user.diaries)
   user: User;
+
+  @OneToOne(() => Analysis, (analysis) => analysis.diary, { nullable: true })
+  analysis: Analysis;
 }
