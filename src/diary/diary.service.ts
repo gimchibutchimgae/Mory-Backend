@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { CreateDiaryDTO } from './dto/diary.dto';
 import { UserService } from 'src/auth/user.service';
 
-const relations = [];
+const relations = ['analysis'];
 
 @Injectable()
 export class DiaryService {
@@ -46,5 +46,9 @@ export class DiaryService {
     await this.diaryRepo.save(diary);
     await this.userService.appendDiary(user, diary);
     return diary;
+  }
+
+  async update(diary: Diary) {
+    return await this.diaryRepo.save(diary);
   }
 }

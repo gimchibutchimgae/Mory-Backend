@@ -6,6 +6,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -46,6 +47,11 @@ export class Diary {
   @ManyToOne(() => User, (user) => user.diaries)
   user: User;
 
-  @OneToOne(() => Analysis, (analysis) => analysis.diary, { nullable: true })
+  @OneToOne(() => Analysis, (analysis) => analysis.diary, {
+    nullable: true,
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
   analysis: Analysis;
 }

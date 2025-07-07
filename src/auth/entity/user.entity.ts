@@ -33,7 +33,7 @@ export class User {
   @Column()
   password: string;
 
-  @Column({ default: 'EN' })
+  @Column({ default: 'EF' })
   mbti: string;
 
   @Column({ type: 'enum', enum: Provider, default: Provider.LOCAL })

@@ -9,5 +9,6 @@ import { AuthModule } from 'src/auth/auth.module';
   imports: [TypeOrmModule.forFeature([Diary]), AuthModule],
   controllers: [DiaryController],
   providers: [DiaryService],
+  exports: [DiaryService],
 })
 export class DiaryModule {}
