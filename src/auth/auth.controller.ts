@@ -4,17 +4,25 @@ import {
   Controller,
   Delete,
   Get,
+  Patch,
   Post,
   Req,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserService } from './user.service';
-import { CreateUserDTO, LoginUserDTO, OAuthDTO } from './dto/user.dto';
+import {
+  CreateUserDTO,
+  LoginUserDTO,
+  OAuthDTO,
+  UpdateUserDTO,
+} from './dto/user.dto';
 import { LoginGuard } from './security/auth.guard';
 import { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { Payload } from './security/payload.interface';
+import { MoryService } from 'src/mory/mory.service';
+import { UpdateMoryDTO } from 'src/mory/dto/mory.dto';
 
 interface TokenResponse {
   accessToken: string;
@@ -30,6 +38,7 @@ export class AuthController {
   constructor(
     private userService: UserService,
     private authService: AuthService,
+    private moryService: MoryService,
   ) {}
 
   @Post('test')
@@ -61,7 +70,14 @@ export class AuthController {
   @Delete('me')
   @UseGuards(LoginGuard)
   async deleteMe(@Req() req: Request) {
+    // 인증 추가
     return await this.authService.deleteByPayload(req.user as Payload);
+  }
+
+  @Patch()
+  @UseGuards(LoginGuard)
+  async update(@Req() req: Request, @Body() updateDto: UpdateUserDTO) {
+    return this.userService.update((req.user as Payload).id, updateDto);
   }
 
   //SECTION - OAuth 2.0
@@ -89,5 +105,12 @@ export class AuthController {
       status: 'login',
       value: tokenResponse,
     };
+  }
+
+  //SECTION - Mory
+  @Patch('mory')
+  @UseGuards(LoginGuard)
+  async updateMory(@Req() req: Request, @Body() updateDto: UpdateMoryDTO) {
+    return this.moryService.update((req.user as Payload).id, updateDto);
   }
 }

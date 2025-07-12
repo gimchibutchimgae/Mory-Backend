@@ -2,10 +2,10 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Diary } from './entity/diary.entity';
 import { Repository } from 'typeorm';
-import { CreateDiaryDTO } from './dto/diary.dto';
+import { CreateDiaryDTO, UpdateDiaryDTO } from './dto/diary.dto';
 import { UserService } from 'src/auth/user.service';
 
-const relations = ['analysis'];
+const relations = ['user', 'analysis'];
 
 @Injectable()
 export class DiaryService {
@@ -48,7 +48,11 @@ export class DiaryService {
     return diary;
   }
 
-  async update(diary: Diary) {
+  async save(diary: Diary) {
     return await this.diaryRepo.save(diary);
+  }
+
+  async update(id: number, updateDto: UpdateDiaryDTO) {
+    return await this.diaryRepo.update(id, updateDto);
   }
 }

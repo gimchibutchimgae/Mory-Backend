@@ -57,7 +57,7 @@ export class AnalysisService {
       });
     }
     diary.analysis = analysis;
-    await this.diaryService.update(diary);
+    await this.diaryService.save(diary);
     return await this.analysisRepo.save(analysis);
   }
 }

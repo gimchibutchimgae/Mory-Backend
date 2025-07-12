@@ -44,7 +44,10 @@ export class Diary {
   @Column({ default: 1 })
   day: number;
 
-  @ManyToOne(() => User, (user) => user.diaries)
+  @ManyToOne(() => User, (user) => user.diaries, {
+    onDelete: 'SET NULL',
+    nullable: true,
+  })
   user: User;
 
   @OneToOne(() => Analysis, (analysis) => analysis.diary, {

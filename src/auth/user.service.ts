@@ -40,9 +40,9 @@ export class UserService {
     return await this.userRepo.save(user);
   }
 
-  async update(updateDto: UpdateUserDTO): Promise<User> {
+  async update(id: number, updateDto: UpdateUserDTO) {
     // pwd 업데이트 필요시 암호화
-    return await this.userRepo.save(updateDto);
+    return await this.userRepo.update(id, updateDto);
   }
 
   async delete(id: number) {
