@@ -9,6 +9,13 @@ import { Repository } from 'typeorm';
 import { CreateAnalysisDTO } from './dto/analysis.dto';
 import { EMOTION_TYPE } from './entity/emotion.type';
 import { DiaryService } from 'src/diary/diary.service';
+import OpenAI from 'openai';
+import { getPromptByDiary } from './gpt/prompt';
+
+type AnalysisResult = {
+  feel: { RED: string[]; YELLOW: string[]; BLUE: string[]; GREEN: string[] };
+  ratio: { RED: number; YELLOW: number; BLUE: number; GREEN: number };
+};
 
 const relations = ['diary'];
 
@@ -25,6 +32,28 @@ export class AnalysisService {
 
   async find(where: import('typeorm').FindOptionsWhere<Analysis>) {
     return await this.analysisRepo.find({ where, relations });
+  }
+
+  async analysisWithGPT(content: string): Promise<AnalysisResult> {
+    const openai = new OpenAI({
+      apiKey: process.env.GPT_API_KEY,
+    });
+
+    const response = await openai.responses.create({
+      model: 'gpt-4o-mini',
+      input: getPromptByDiary(content),
+      store: true,
+    });
+    console.log(response);
+    try {
+      const result = response.output_text;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return JSON.parse(result);
+    } catch {
+      throw new InternalServerErrorException(
+        '분석 결과를 불러오는 과정에서 문제가 발생하였습니다. 다시 시도해주세요.',
+      );
+    }
   }
 
   // 이 함수는 ChatGPT API 호출 후에 받아오는 실행시킬 것으로 예상

@@ -27,7 +27,7 @@ export class DiaryController {
     const payload = req.user as Payload;
     const diary = await this.diaryService.findOne({ id });
     if (!diary) throw new NotFoundException('해당 일기가 존재하지 않습니다.');
-    if (diary.user.id !== payload.id && payload.role == Role.USER)
+    if (diary.user?.id !== payload.id && payload.role == Role.USER)
       throw new ForbiddenException('해당 일기의 소유자가 아닙니다.');
     return diary;
   }
