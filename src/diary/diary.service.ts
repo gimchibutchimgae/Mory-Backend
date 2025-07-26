@@ -36,15 +36,23 @@ export class DiaryService {
     const now = new Date();
     const month = now.getMonth() + 1;
     const day = now.getDate();
-
-    const diary = this.diaryRepo.create({
-      user,
-      month,
-      day,
-      ...createDto,
-    });
-    await this.diaryRepo.save(diary);
-    await this.userService.appendDiary(user, diary);
+    const existDiary = await this.findOne({ month, day });
+    let diary: Diary;
+    if (existDiary) {
+      // 같은 날 작성한 일기 존재시 업데이트
+      diary = existDiary;
+      await this.diaryRepo.update(existDiary.id, createDto);
+    } else {
+      diary = this.diaryRepo.create({
+        user,
+        month,
+        day,
+        ...createDto,
+      });
+      await this.diaryRepo.save(diary);
+      await this.userService.appendDiary(user, diary);
+    }
+    // TODO: 일기 쓸때마다 성장 관련 처리
     return diary;
   }
 

@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -17,7 +18,7 @@ import { Diary } from 'src/diary/entity/diary.entity';
 const API_PARSE_ERROR =
   '분석 결과를 불러오는 과정에서 문제가 발생하였습니다. 다시 시도해주세요.';
 
-const relations = ['diary'];
+const relations = ['diary', 'diary.user'];
 
 @Injectable()
 export class AnalysisService {
@@ -35,14 +36,14 @@ export class AnalysisService {
   }
 
   // Analysis -> Save
-  async analysisDiary(diaryId: number) {
+  async analysisDiary(userId: number, diaryId: number) {
     // Diary 검색
     const diary = await this.diaryService.findOne({ id: diaryId });
     if (!diary) throw new NotFoundException('해당 일기를 찾을 수 없습니다.');
-
-    if (diary.content.replaceAll(' ', '').length === 0) {
+    if (diary.user.id !== userId)
+      throw new ForbiddenException('해당 일기에 대한 접근 권한이 없습니다.');
+    if (diary.content.replaceAll(' ', '').length === 0)
       throw new BadRequestException('일기에 내용을 기입해주세요.');
-    }
 
     const result = await this.analysisWithGPT(diary.content);
     //const result = GPT_RESULT_EXAMPLE;

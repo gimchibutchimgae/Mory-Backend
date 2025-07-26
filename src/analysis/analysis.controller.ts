@@ -1,6 +1,17 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  ForbiddenException,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { AnalysisService } from './analysis.service';
 import { LoginGuard } from 'src/auth/security/auth.guard';
+import { Request } from 'express';
+import { Payload } from 'src/auth/security/payload.interface';
 
 @Controller('analysis')
 export class AnalysisController {
@@ -8,14 +19,17 @@ export class AnalysisController {
 
   @Get(':id')
   @UseGuards(LoginGuard)
-  find(@Param('id') id: number) {
-    // 사용자 인증 처리
-    return this.analysisService.findOne({ id });
+  async find(@Req() req: Request, @Param('id') id: number) {
+    const payload = req.user as Payload;
+    const analysis = await this.analysisService.findOne({ id });
+    if (payload.id != analysis?.diary.user.id)
+      throw new ForbiddenException('해당 일기에 대한 접근 권한이 없습니다.');
   }
 
   @Post('gpt')
   @UseGuards(LoginGuard)
-  async analysis(@Body() diary: { id: number }) {
-    return await this.analysisService.analysisDiary(diary.id);
+  async analysis(@Req() req: Request, @Body() body: { diaryId: number }) {
+    const payload = req.user as Payload;
+    return await this.analysisService.analysisDiary(payload.id, body.diaryId);
   }
 }

@@ -1,3 +1,4 @@
+import { IsInt, Max, Min } from 'class-validator';
 import { User } from 'src/auth/entity/user.entity';
 import { Column, Entity, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -11,6 +12,9 @@ export class Mory {
   })
   user: User;
 
+  @IsInt()
+  @Min(0)
+  @Max(5)
   @Column({ default: 0 })
   growing: number;
 }

@@ -40,7 +40,6 @@ export class DiaryController {
     return diaries;
   }
 
-  // 중복 날짜 고려
   @Post()
   @UseGuards(LoginGuard)
   async write(@Req() req: Request, @Body() createDto: CreateDiaryDTO) {
@@ -56,7 +55,11 @@ export class DiaryController {
     @Param('id') id: number,
     @Body() updateDto: UpdateDiaryDTO,
   ) {
-    // 계정 인증 구현
+    // 계정 인증
+    const diary = await this.diaryService.findOne({ id });
+    if (!diary) throw new NotFoundException('해당 일기가 존재하지 않습니다.');
+    if (diary.user.id !== (req.user as Payload).id)
+      throw new ForbiddenException('해당 일기에 대한 접근 권한이 없습니다.');
     return await this.diaryService.update(id, updateDto);
   }
 }
