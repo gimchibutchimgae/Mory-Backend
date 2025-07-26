@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -11,11 +12,10 @@ import { EMOTION_TYPE } from './entity/emotion.type';
 import { DiaryService } from 'src/diary/diary.service';
 import OpenAI from 'openai';
 import { getPromptByDiary } from './gpt/prompt';
+import { Diary } from 'src/diary/entity/diary.entity';
 
-type AnalysisResult = {
-  feel: { RED: string[]; YELLOW: string[]; BLUE: string[]; GREEN: string[] };
-  ratio: { RED: number; YELLOW: number; BLUE: number; GREEN: number };
-};
+const API_PARSE_ERROR =
+  '분석 결과를 불러오는 과정에서 문제가 발생하였습니다. 다시 시도해주세요.';
 
 const relations = ['diary'];
 
@@ -34,7 +34,23 @@ export class AnalysisService {
     return await this.analysisRepo.find({ where, relations });
   }
 
-  async analysisWithGPT(content: string): Promise<AnalysisResult> {
+  // Analysis -> Save
+  async analysisDiary(diaryId: number) {
+    // Diary 검색
+    const diary = await this.diaryService.findOne({ id: diaryId });
+    if (!diary) throw new NotFoundException('해당 일기를 찾을 수 없습니다.');
+
+    if (diary.content.replaceAll(' ', '').length === 0) {
+      throw new BadRequestException('일기에 내용을 기입해주세요.');
+    }
+
+    const result = await this.analysisWithGPT(diary.content);
+    //const result = GPT_RESULT_EXAMPLE;
+    const analysis = await this.create(diary, result);
+    return analysis;
+  }
+
+  async analysisWithGPT(content: string): Promise<CreateAnalysisDTO> {
     const openai = new OpenAI({
       apiKey: process.env.GPT_API_KEY,
     });
@@ -44,38 +60,35 @@ export class AnalysisService {
       input: getPromptByDiary(content),
       store: true,
     });
-    console.log(response);
+
     try {
-      const result = response.output_text;
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-      return JSON.parse(result);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const result: CreateAnalysisDTO = JSON.parse(response.output_text);
+      if (!result.feel || !result.ratio)
+        throw new InternalServerErrorException(API_PARSE_ERROR);
+      return result;
     } catch {
-      throw new InternalServerErrorException(
-        '분석 결과를 불러오는 과정에서 문제가 발생하였습니다. 다시 시도해주세요.',
-      );
+      throw new InternalServerErrorException(API_PARSE_ERROR);
     }
   }
 
   // 이 함수는 ChatGPT API 호출 후에 받아오는 실행시킬 것으로 예상
-  async create(createDto: CreateAnalysisDTO) {
-    // Diary 검색
-    const diary = await this.diaryService.findOne({ id: createDto.diaryId });
-    if (!diary) throw new NotFoundException('해당 일기를 찾을 수 없습니다.');
+  async create(diary: Diary, createDto: CreateAnalysisDTO) {
     // ratio 정렬
+    let primary_emotion_type: EMOTION_TYPE;
     try {
-      createDto.ratio = createDto.ratio.sort(([, v1], [, v2]) => v2 - v1);
-      console.log('ratio ', createDto.ratio);
+      const sortedEntries = Object.entries(createDto.ratio).sort(
+        ([, v1], [, v2]) => v2 - v1,
+      );
+      primary_emotion_type = sortedEntries[0][0] as EMOTION_TYPE;
     } catch {
       // GPT 결과값이 원하는 형태로 반환되지 않을 경우 생기는 문제
-      throw new InternalServerErrorException(
-        '분석 결과를 불러오는 과정에서 문제가 발생하였습니다. 다시 시도해주세요.',
-      );
+      throw new InternalServerErrorException(API_PARSE_ERROR);
     }
-    const primary_emotion_type: EMOTION_TYPE = createDto.ratio[0][0];
     let analysis: Analysis;
     if (diary.analysis) {
       analysis = diary.analysis;
-      analysis.emotions = createDto.emotions;
+      analysis.feel = createDto.feel;
       analysis.ratio = createDto.ratio;
       analysis.primary_emotion_type = primary_emotion_type;
     } else {

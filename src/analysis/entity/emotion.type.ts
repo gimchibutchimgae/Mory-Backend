@@ -2,7 +2,12 @@
 /* eslint-disable prettier/prettier */
 export type EMOTION_TYPE = 'RED' | 'YELLOW' | 'BLUE' | 'GREEN';
 
-export type EMOTION_RATIO = [EMOTION_TYPE, number][];
+export type EMOTION_RATIO = {
+  'RED':number;
+  'YELLOW':number;
+  'BLUE':number;
+  'GREEN':number;
+};
 
 export const EMOTIONS = {
   RED : [ "격분한", "공황에 빠진", "스트레스 받는", "초조한", "충격받은",
@@ -35,9 +40,9 @@ export type YellowEmotion = (typeof EMOTIONS.RED)[number];
 export type BlueEmotion = (typeof EMOTIONS.RED)[number];
 export type GreenEmotion = (typeof EMOTIONS.RED)[number];
 
-export interface INCLUDED_EMOTIONS {
-  RED : RedEmotion[],
-  YELLOW : YellowEmotion[],
-  BLUE : BlueEmotion[],
-  GREEN : GreenEmotion[],
+export interface EMOTION_CLUES {
+  RED : string[],
+  YELLOW : string[],
+  BLUE : string[],
+  GREEN : string[],
 }

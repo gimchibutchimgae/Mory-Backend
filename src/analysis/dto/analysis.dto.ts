@@ -1,7 +1,6 @@
-import { EMOTION_RATIO, INCLUDED_EMOTIONS } from '../entity/emotion.type';
+import { EMOTION_RATIO, EMOTION_CLUES } from '../entity/emotion.type';
 
 export interface CreateAnalysisDTO {
-  diaryId: number;
-  emotions: INCLUDED_EMOTIONS;
+  feel: EMOTION_CLUES;
   ratio: EMOTION_RATIO;
 }

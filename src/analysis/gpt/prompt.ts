@@ -1,3 +1,5 @@
+import { CreateAnalysisDTO } from '../dto/analysis.dto';
+
 export function getPromptByDiary(content: string) {
   return `너는 감정 분석기야.
 
@@ -134,7 +136,7 @@ GREEN : ["속 편한", "태평한", "자족하는", "다정한", "충만한",
 """
 `;
 
-export const RESULT_EXAMPLE = {
+export const GPT_RESULT_EXAMPLE: CreateAnalysisDTO = {
   feel: {
     RED: ['당황하고', '짜증도 났'],
     YELLOW: [],

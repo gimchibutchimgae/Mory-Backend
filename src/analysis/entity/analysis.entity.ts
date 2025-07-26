@@ -6,7 +6,7 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { EMOTION_RATIO, EMOTION_TYPE, INCLUDED_EMOTIONS } from './emotion.type';
+import { EMOTION_RATIO, EMOTION_TYPE, EMOTION_CLUES } from './emotion.type';
 
 @Entity()
 export class Analysis {
@@ -21,7 +21,7 @@ export class Analysis {
   primary_emotion_type: EMOTION_TYPE;
 
   @Column('simple-json')
-  emotions: INCLUDED_EMOTIONS;
+  feel: EMOTION_CLUES;
 
   // MySQL : 'simple-json' | PostgreSQL : 'json'
   @Column('simple-json')
