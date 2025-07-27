@@ -7,9 +7,11 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
   app.enableCors({
-    origin: 'http://localhost:5500', // 리액트 포트
-    credentials: true,
+    origin: '*', // 모든 출처 허용 (개발용)
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    credentials: true, // 필요하면
   });
 
   app.useGlobalPipes(
