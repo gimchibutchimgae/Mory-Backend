@@ -50,7 +50,7 @@ export class DiaryController {
 
   private readonly logger = new Logger('Diary');
 
-  @Post('write')
+  @Post()
   @UseGuards(LoginGuard)
   async write(@Req() req: Request, @Body() createDto: CreateDiaryDTO) {
     const payload = req.user as Payload;
@@ -58,18 +58,6 @@ export class DiaryController {
     const diary = await this.diaryService.create(payload.id, createDto);
     this.logger.warn(diary);
     return diary;
-  }
-
-  @Post('test1')
-  asfaf(@Body() createDto: CreateDiaryDTO) {
-    this.logger.warn('Hello world');
-    return createDto;
-  }
-
-  @Post('test2')
-  asfaf2(@Req() req: Request) {
-    this.logger.warn('Hello world2');
-    return req.user;
   }
 
   @Patch(':id')

@@ -41,6 +41,7 @@ export class DiaryService {
         result[`${record.day}`] = 'YET';
       }
     });
+    return result;
   }
 
   async create(userId: number, createDto: CreateDiaryDTO) {
