@@ -1,9 +1,10 @@
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Diary } from './entity/diary.entity';
 import { Repository } from 'typeorm';
 import { CreateDiaryDTO, UpdateDiaryDTO } from './dto/diary.dto';
 import { UserService } from 'src/auth/user.service';
+import { MoryService } from 'src/mory/mory.service';
 
 const relations = ['user', 'analysis'];
 
@@ -12,8 +13,8 @@ export class DiaryService {
   constructor(
     @InjectRepository(Diary) private diaryRepo: Repository<Diary>,
     private userService: UserService,
+    private moryService: MoryService,
   ) {}
-  private readonly logger = new Logger('TTEST');
 
   async find(where: import('typeorm').FindOptionsWhere<Diary>) {
     return await this.diaryRepo.find({ where, relations });
@@ -46,7 +47,6 @@ export class DiaryService {
 
   async create(userId: number, createDto: CreateDiaryDTO) {
     const user = await this.userService.findOne({ id: userId });
-    this.logger.warn(userId);
     if (!user)
       throw new UnauthorizedException(
         '계정이 유효하지 않습니다. 다시 로그인하여 주세요.',
@@ -62,26 +62,26 @@ export class DiaryService {
     });
     let diary: Diary;
 
-    this.logger.log(existDiary);
     if (existDiary) {
-      this.logger.log('entry 1');
       // 같은 날 작성한 일기 존재시 업데이트
       diary = existDiary;
-      this.logger.log(diary);
       await this.diaryRepo.update(existDiary.id, createDto);
     } else {
-      this.logger.log('entry 2');
       diary = this.diaryRepo.create({
         user,
         month,
         day,
         ...createDto,
       });
-      this.logger.log(diary);
       await this.diaryRepo.save(diary);
       await this.userService.appendDiary(user, diary);
     }
     // TODO: 일기 쓸때마다 성장 관련 처리
+    let growing = Math.floor(user.diaries.length / 3);
+    if (growing >= 6) {
+      growing = 6;
+    }
+    await this.moryService.update(user.mory.id, { growing });
     return diary;
   }
 

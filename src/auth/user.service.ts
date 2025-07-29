@@ -7,7 +7,7 @@ import * as bcrypt from 'bcrypt';
 import { Payload } from './security/payload.interface';
 import { Diary } from 'src/diary/entity/diary.entity';
 
-const relations = ['diaries'];
+const relations = ['diaries', 'mory'];
 
 @Injectable()
 export class UserService {

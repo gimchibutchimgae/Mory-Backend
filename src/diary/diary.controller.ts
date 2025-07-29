@@ -21,6 +21,7 @@ import { Role } from 'src/auth/entity/user.entity';
 @Controller('diary')
 export class DiaryController {
   constructor(private diaryService: DiaryService) {}
+  private readonly logger = new Logger('Diary');
 
   // 달마나 일기
   @Get('summary/:month')
@@ -48,15 +49,12 @@ export class DiaryController {
     return diaries;
   }
 
-  private readonly logger = new Logger('Diary');
-
   @Post()
   @UseGuards(LoginGuard)
   async write(@Req() req: Request, @Body() createDto: CreateDiaryDTO) {
     const payload = req.user as Payload;
-    this.logger.warn(payload);
+    this.logger.log(`${payload?.email} 일기 작성`);
     const diary = await this.diaryService.create(payload.id, createDto);
-    this.logger.warn(diary);
     return diary;
   }
 

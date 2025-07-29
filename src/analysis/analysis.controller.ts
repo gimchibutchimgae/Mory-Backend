@@ -1,8 +1,10 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   ForbiddenException,
   Get,
+  Logger,
   Param,
   Post,
   Req,
@@ -16,6 +18,7 @@ import { Payload } from 'src/auth/security/payload.interface';
 @Controller('analysis')
 export class AnalysisController {
   constructor(private analysisService: AnalysisService) {}
+  private logger = new Logger('Analysis');
 
   @Get(':id')
   @UseGuards(LoginGuard)
@@ -29,7 +32,9 @@ export class AnalysisController {
   @Post('gpt')
   @UseGuards(LoginGuard)
   async analysis(@Req() req: Request, @Body() body: { diaryId: number }) {
+    if (!body.diaryId) throw new BadRequestException();
     const payload = req.user as Payload;
+    this.logger.log(`${payload.email} 일기 분석`);
     return await this.analysisService.analysisDiary(payload.id, body.diaryId);
   }
 }

@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Patch,
   Post,
   Req,
@@ -22,7 +23,6 @@ import { Request } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { Payload } from './security/payload.interface';
 import { MoryService } from 'src/mory/mory.service';
-import { UpdateMoryDTO } from 'src/mory/dto/mory.dto';
 
 interface TokenResponse {
   accessToken: string;
@@ -40,6 +40,7 @@ export class AuthController {
     private authService: AuthService,
     private moryService: MoryService,
   ) {}
+  private readonly logger = new Logger('Auth');
 
   @Post('test')
   @UseGuards(LoginGuard)
@@ -59,11 +60,13 @@ export class AuthController {
       throw new BadRequestException(
         '이메일 또는 비밀번호를 입력하여야 합니다.',
       );
+    this.logger.log(`${loginDto.email} 로그인`);
     return await this.authService.vaildateUser(loginDto);
   }
 
   @Post('register')
   async register(@Body() createDto: CreateUserDTO) {
+    this.logger.log(`${createDto.email} 회원가입`);
     return await this.authService.register(createDto);
   }
 
@@ -71,7 +74,9 @@ export class AuthController {
   @UseGuards(LoginGuard)
   async deleteMe(@Req() req: Request) {
     // 인증 추가
-    return await this.authService.deleteByPayload(req.user as Payload);
+    const payload = req.user as Payload;
+    this.logger.log(`${payload?.email} 회원탈퇴`);
+    return await this.authService.deleteByPayload(payload);
   }
 
   @Patch()
@@ -108,9 +113,12 @@ export class AuthController {
   }
 
   //SECTION - Mory
-  @Patch('mory')
+  @Get('mory')
   @UseGuards(LoginGuard)
-  async updateMory(@Req() req: Request, @Body() updateDto: UpdateMoryDTO) {
-    return this.moryService.update((req.user as Payload).id, updateDto);
+  async updateMory(@Req() req: Request) {
+    const user = await this.userService.findOne({
+      id: (req.user as Payload).id,
+    });
+    return user?.mory;
   }
 }
