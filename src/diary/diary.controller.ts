@@ -21,6 +21,10 @@ import { Role } from 'src/auth/entity/user.entity';
 export class DiaryController {
   constructor(private diaryService: DiaryService) {}
 
+  // 소유한 모든 일기
+
+  // 달마나 일기
+
   @Get(':id')
   @UseGuards(LoginGuard)
   async find(@Req() req: Request, @Param('id') id: number) {
@@ -44,7 +48,9 @@ export class DiaryController {
   @UseGuards(LoginGuard)
   async write(@Req() req: Request, @Body() createDto: CreateDiaryDTO) {
     const payload = req.user as Payload;
+    console.log(1, payload);
     const diary = await this.diaryService.create(payload.id, createDto);
+    console.log(4, diary);
     return diary;
   }
 

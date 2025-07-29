@@ -43,7 +43,6 @@ export class AuthService {
       );
     // User Entity 의존성 관련
     const mory = await this.moryService.create(user);
-    user.password = await this.userService.encrypt(user.password);
     await this.userService.init(user, { mory });
     return user;
   }

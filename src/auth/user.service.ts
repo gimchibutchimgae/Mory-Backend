@@ -30,6 +30,7 @@ export class UserService {
     return user;
   }
 
+  /** Include encrypting password */
   async create(createDto: CreateUserDTO): Promise<User> {
     await this.encryptPassword(createDto);
     return await this.userRepo.save(createDto);
