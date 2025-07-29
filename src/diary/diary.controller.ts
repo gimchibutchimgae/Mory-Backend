@@ -29,7 +29,7 @@ export class DiaryController {
     return await this.diaryService.summary((req.user as Payload).id, month);
   }
 
-  @Get(':id')
+  @Get('view/:id')
   @UseGuards(LoginGuard)
   async find(@Req() req: Request, @Param('id') id: number) {
     const payload = req.user as Payload;
@@ -49,12 +49,6 @@ export class DiaryController {
   }
 
   private readonly logger = new Logger('Diary');
-
-  @Get()
-  @UseGuards(LoginGuard)
-  asd(@Req() req: Request) {
-    this.logger.log(req.user);
-  }
 
   @Post()
   @UseGuards(LoginGuard)
