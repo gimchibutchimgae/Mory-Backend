@@ -45,6 +45,7 @@ export class DiaryService {
 
   async create(userId: number, createDto: CreateDiaryDTO) {
     const user = await this.userService.findOne({ id: userId });
+    this.logger.warn(userId);
     if (!user)
       throw new UnauthorizedException(
         '계정이 유효하지 않습니다. 다시 로그인하여 주세요.',
