@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   Injectable,
   InternalServerErrorException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -26,6 +27,7 @@ export class AnalysisService {
     @InjectRepository(Analysis) private analysisRepo: Repository<Analysis>,
     private diaryService: DiaryService,
   ) {}
+  private logger = new Logger('Analysis');
 
   async findOne(where: import('typeorm').FindOptionsWhere<Analysis>) {
     return await this.analysisRepo.findOne({ where, relations });
@@ -44,7 +46,7 @@ export class AnalysisService {
       throw new ForbiddenException('해당 일기에 대한 접근 권한이 없습니다.');
     if (diary.content.replaceAll(' ', '').length === 0)
       throw new BadRequestException('일기에 내용을 기입해주세요.');
-
+    this.logger.log('분석: 값 오류 없음');
     const result = await this.analysisWithGPT(diary.content);
     //const result = GPT_RESULT_EXAMPLE;
     const analysis = await this.create(diary, result);
@@ -56,15 +58,19 @@ export class AnalysisService {
       apiKey: process.env.GPT_API_KEY,
     });
 
+    this.logger.log('분석: GPT API response');
     const response = await openai.responses.create({
       model: 'gpt-4o-mini',
       input: getPromptByDiary(content),
       store: true,
     });
+    this.logger.log('분석: GPT API request');
+    this.logger.debug(response.output_text);
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const result: CreateAnalysisDTO = JSON.parse(response.output_text);
+      this.logger.log('분석: 결과값 JSON으로 파싱');
       if (!result.feel || !result.ratio)
         throw new InternalServerErrorException(API_PARSE_ERROR);
       return result;
