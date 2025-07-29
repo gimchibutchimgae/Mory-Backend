@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Diary } from './entity/diary.entity';
 import { Repository } from 'typeorm';
@@ -13,6 +13,7 @@ export class DiaryService {
     @InjectRepository(Diary) private diaryRepo: Repository<Diary>,
     private userService: UserService,
   ) {}
+  private readonly logger = new Logger('TTEST');
 
   async find(where: import('typeorm').FindOptionsWhere<Diary>) {
     return await this.diaryRepo.find({ where, relations });
@@ -39,22 +40,22 @@ export class DiaryService {
     const existDiary = await this.findOne({ month, day });
     let diary: Diary;
 
-    console.log(1.5, existDiary);
+    this.logger.log(1.5, existDiary);
     if (existDiary) {
-      console.log(2, 'entry 1');
+      this.logger.log(2, 'entry 1');
       // 같은 날 작성한 일기 존재시 업데이트
       diary = existDiary;
-      console.log(3, diary);
+      this.logger.log(3, diary);
       await this.diaryRepo.update(existDiary.id, createDto);
     } else {
-      console.log(2, 'entry 2');
+      this.logger.log(2, 'entry 2');
       diary = this.diaryRepo.create({
         user,
         month,
         day,
         ...createDto,
       });
-      console.log(3, diary);
+      this.logger.log(3, diary);
       await this.diaryRepo.save(diary);
       await this.userService.appendDiary(user, diary);
     }
