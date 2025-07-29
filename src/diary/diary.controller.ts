@@ -24,6 +24,7 @@ export class DiaryController {
 
   // 달마나 일기
   @Get('summary/:month')
+  @UseGuards(LoginGuard)
   async summary(@Req() req: Request, @Param('month') month: number) {
     return await this.diaryService.summary((req.user as Payload).id, month);
   }
@@ -49,13 +50,19 @@ export class DiaryController {
 
   private readonly logger = new Logger('Diary');
 
+  @Get()
+  @UseGuards(LoginGuard)
+  asd(@Req() req: Request) {
+    this.logger.log(req.user);
+  }
+
   @Post()
   @UseGuards(LoginGuard)
   async write(@Req() req: Request, @Body() createDto: CreateDiaryDTO) {
     const payload = req.user as Payload;
-    this.logger.log(1, payload);
+    this.logger.log(payload);
     const diary = await this.diaryService.create(payload.id, createDto);
-    this.logger.log(4, diary);
+    this.logger.log(diary);
     return diary;
   }
 
