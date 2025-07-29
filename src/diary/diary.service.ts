@@ -37,25 +37,29 @@ export class DiaryService {
     const now = new Date();
     const month = now.getMonth() + 1;
     const day = now.getDate();
-    const existDiary = await this.findOne({ month, day });
+    const existDiary = await this.findOne({
+      month,
+      day,
+      user: { id: user.id },
+    });
     let diary: Diary;
 
-    this.logger.log(1.5, existDiary);
+    this.logger.log(existDiary);
     if (existDiary) {
-      this.logger.log(2, 'entry 1');
+      this.logger.log('entry 1');
       // 같은 날 작성한 일기 존재시 업데이트
       diary = existDiary;
-      this.logger.log(3, diary);
+      this.logger.log(diary);
       await this.diaryRepo.update(existDiary.id, createDto);
     } else {
-      this.logger.log(2, 'entry 2');
+      this.logger.log('entry 2');
       diary = this.diaryRepo.create({
         user,
         month,
         day,
         ...createDto,
       });
-      this.logger.log(3, diary);
+      this.logger.log(diary);
       await this.diaryRepo.save(diary);
       await this.userService.appendDiary(user, diary);
     }
