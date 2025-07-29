@@ -3,6 +3,7 @@ import {
   Controller,
   ForbiddenException,
   Get,
+  Logger,
   NotFoundException,
   Param,
   Patch,
@@ -21,9 +22,11 @@ import { Role } from 'src/auth/entity/user.entity';
 export class DiaryController {
   constructor(private diaryService: DiaryService) {}
 
-  // 소유한 모든 일기
-
   // 달마나 일기
+  @Get('summary/:month')
+  async summary(@Req() req: Request, @Param('month') month: number) {
+    return await this.diaryService.summary((req.user as Payload).id, month);
+  }
 
   @Get(':id')
   @UseGuards(LoginGuard)
@@ -44,13 +47,15 @@ export class DiaryController {
     return diaries;
   }
 
+  private readonly logger = new Logger('Diary');
+
   @Post()
   @UseGuards(LoginGuard)
   async write(@Req() req: Request, @Body() createDto: CreateDiaryDTO) {
     const payload = req.user as Payload;
-    console.log(1, payload);
+    this.logger.log(1, payload);
     const diary = await this.diaryService.create(payload.id, createDto);
-    console.log(4, diary);
+    this.logger.log(4, diary);
     return diary;
   }
 

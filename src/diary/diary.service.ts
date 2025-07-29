@@ -27,6 +27,22 @@ export class DiaryService {
     return await this.find({ user: { id: userId } });
   }
 
+  async summary(userId: number, month: number) {
+    const result = {};
+    for (let i = 0; i < 31; i++) {
+      result[`${i + 1}`] = null;
+    }
+    const records = await this.find({ month, user: { id: userId } });
+    records.forEach((record) => {
+      const value = record.analysis?.primary_emotion_type;
+      if (value) {
+        result[`${record.day}`] = value;
+      } else {
+        result[`${record.day}`] = 'YET';
+      }
+    });
+  }
+
   async create(userId: number, createDto: CreateDiaryDTO) {
     const user = await this.userService.findOne({ id: userId });
     if (!user)

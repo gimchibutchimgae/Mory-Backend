@@ -16,7 +16,7 @@ import { MoryModule } from 'src/mory/mory.module';
     PassportModule,
     JwtModule.register({
       secret: process.env.JWTKEY, // dotenv로 분리 가능
-      signOptions: { expiresIn: '4h' },
+      signOptions: { expiresIn: '12h' },
     }),
     MoryModule,
   ],
