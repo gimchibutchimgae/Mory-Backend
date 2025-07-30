@@ -68,8 +68,11 @@ export class AnalysisService {
     this.logger.debug(response.output_text);
 
     try {
+      const output = response.output_text
+        .replaceAll('```', '')
+        .replaceAll('json', '');
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const result: CreateAnalysisDTO = JSON.parse(response.output_text);
+      const result: CreateAnalysisDTO = JSON.parse(output);
       this.logger.log('분석: 결과값 JSON으로 파싱');
       if (!result.feel || !result.ratio)
         throw new InternalServerErrorException(API_PARSE_ERROR);

@@ -1,4 +1,5 @@
 import { Diary } from 'src/diary/entity/diary.entity';
+import { MonthlyAnalysis } from 'src/monthly_analysis/entity/monthly_analysis.entity';
 import { Mory } from 'src/mory/entity/mory.entity';
 import {
   Column,
@@ -48,4 +49,7 @@ export class User {
 
   @OneToMany(() => Diary, (diary) => diary.user)
   diaries: Diary[];
+
+  @OneToMany(() => MonthlyAnalysis, (monthly) => monthly.user)
+  monthlyAnalysis: MonthlyAnalysis[];
 }

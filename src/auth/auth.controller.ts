@@ -42,7 +42,7 @@ export class AuthController {
   ) {}
   private readonly logger = new Logger('Auth');
 
-  @Post('test')
+  @Get('test')
   @UseGuards(LoginGuard)
   test(@Req() req: Request) {
     return req.user;

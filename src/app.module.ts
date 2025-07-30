@@ -10,6 +10,9 @@ import { DiaryModule } from './diary/diary.module';
 import { Diary } from './diary/entity/diary.entity';
 import { AnalysisModule } from './analysis/analysis.module';
 import { Analysis } from './analysis/entity/analysis.entity';
+import { MonthlyAnalysisService } from './monthly_analysis/monthly_analysis.service';
+import { MonthlyAnalysisModule } from './monthly_analysis/monthly_analysis.module';
+import { MonthlyAnalysis } from './monthly_analysis/entity/monthly_analysis.entity';
 
 @Module({
   imports: [
@@ -20,15 +23,16 @@ import { Analysis } from './analysis/entity/analysis.entity';
       username: process.env.DB_USERNAME,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
-      entities: [User, Mory, Diary, Analysis],
+      entities: [User, Mory, Diary, Analysis, MonthlyAnalysis],
       synchronize: true,
     }),
     AuthModule,
     MoryModule,
     DiaryModule,
     AnalysisModule,
+    MonthlyAnalysisModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, MonthlyAnalysisService],
 })
 export class AppModule {}
