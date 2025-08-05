@@ -8,8 +8,8 @@ import {
   Patch,
   Post,
   Req,
-  UseGuards,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserService } from './user.service';
@@ -89,7 +89,9 @@ export class AuthController {
   //SECTION - OAuth 2.0
   @Get('google')
   @UseGuards(AuthGuard('google'))
-  async googleLogin(): Promise<void> {}
+  googleLogin() {
+    this.logger.log(`누군가 Google Redirect 요청`);
+  }
 
   @Get('google/redirect')
   @UseGuards(AuthGuard('google'))
@@ -102,12 +104,12 @@ export class AuthController {
 
     if (!existUser) {
       // Register flow
-      const redirectUrl = `exp://YOUR_APP_SCHEME/--/auth/google/redirect?status=register&email=${user.email}&name=${user.name}&provider=${user.provider}`;
+      const redirectUrl = `exp://192.168.45.63//--/auth/google/redirect?status=register&email=${user.email}&name=${user.name}&provider=${user.provider}`;
       return res.redirect(redirectUrl);
     } else {
       // Login flow
       const tokenResponse = this.authService.vaildateOAuth(user, existUser);
-      const redirectUrl = `exp://YOUR_APP_SCHEME/--/auth/google/redirect?status=login&accessToken=${tokenResponse.accessToken}`;
+      const redirectUrl = `exp://192.168.45.63//--/auth/google/redirect?status=login&accessToken=${tokenResponse.accessToken}`;
       return res.redirect(redirectUrl);
     }
   }
