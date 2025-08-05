@@ -9,6 +9,7 @@ import {
   Post,
   Req,
   UseGuards,
+  Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserService } from './user.service';
@@ -19,7 +20,7 @@ import {
   UpdateUserDTO,
 } from './dto/user.dto';
 import { LoginGuard } from './security/auth.guard';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
 import { Payload } from './security/payload.interface';
 import { MoryService } from 'src/mory/mory.service';
@@ -92,24 +93,23 @@ export class AuthController {
 
   @Get('google/redirect')
   @UseGuards(AuthGuard('google'))
-  async googleLoginRedirect(@Req() req: Request): Promise<OAuthReturn> {
-    /* 
-      login : { status: 'login', value: JWT-String }
-      register : { status: 'register', value: OAuthDTO }
-    */
+  async googleLoginRedirect(
+    @Req() req: Request,
+    @Res() res: Response,
+  ): Promise<void> {
     const user = req.user as OAuthDTO;
     const existUser = await this.userService.findOne({ email: user.email });
+
     if (!existUser) {
-      return {
-        status: 'register',
-        value: user,
-      };
+      // Register flow
+      const redirectUrl = `exp://YOUR_APP_SCHEME/--/auth/google/redirect?status=register&email=${user.email}&name=${user.name}&provider=${user.provider}`;
+      return res.redirect(redirectUrl);
+    } else {
+      // Login flow
+      const tokenResponse = this.authService.vaildateOAuth(user, existUser);
+      const redirectUrl = `exp://YOUR_APP_SCHEME/--/auth/google/redirect?status=login&accessToken=${tokenResponse.accessToken}`;
+      return res.redirect(redirectUrl);
     }
-    const tokenResponse = this.authService.vaildateOAuth(user, existUser);
-    return {
-      status: 'login',
-      value: tokenResponse,
-    };
   }
 
   //SECTION - Mory
