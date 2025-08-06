@@ -10,7 +10,6 @@ import { DiaryModule } from './diary/diary.module';
 import { Diary } from './diary/entity/diary.entity';
 import { AnalysisModule } from './analysis/analysis.module';
 import { Analysis } from './analysis/entity/analysis.entity';
-import { MonthlyAnalysisService } from './monthly_analysis/monthly_analysis.service';
 import { MonthlyAnalysisModule } from './monthly_analysis/monthly_analysis.module';
 import { MonthlyAnalysis } from './monthly_analysis/entity/monthly_analysis.entity';
 
@@ -33,6 +32,6 @@ import { MonthlyAnalysis } from './monthly_analysis/entity/monthly_analysis.enti
     MonthlyAnalysisModule,
   ],
   controllers: [AppController],
-  providers: [AppService, MonthlyAnalysisService],
+  providers: [AppService],
 })
 export class AppModule {}

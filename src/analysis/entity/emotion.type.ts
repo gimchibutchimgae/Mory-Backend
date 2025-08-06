@@ -2,7 +2,7 @@
 /* eslint-disable prettier/prettier */
 export type EMOTION_TYPE = 'RED' | 'YELLOW' | 'BLUE' | 'GREEN';
 
-export type EMOTION_RATIO = {
+export type EMOTION_NUMBERS = {
   'RED':number;
   'YELLOW':number;
   'BLUE':number;
