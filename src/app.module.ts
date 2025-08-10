@@ -12,6 +12,8 @@ import { AnalysisModule } from './analysis/analysis.module';
 import { Analysis } from './analysis/entity/analysis.entity';
 import { MonthlyAnalysisModule } from './monthly_analysis/monthly_analysis.module';
 import { MonthlyAnalysis } from './monthly_analysis/entity/monthly_analysis.entity';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -24,6 +26,10 @@ import { MonthlyAnalysis } from './monthly_analysis/entity/monthly_analysis.enti
       database: process.env.DB_DATABASE,
       entities: [User, Mory, Diary, Analysis, MonthlyAnalysis],
       synchronize: true,
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+      serveRoot: '/public', // http://localhost:3000/public/~~ 경로로 제공
     }),
     AuthModule,
     MoryModule,

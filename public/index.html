@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>OAuth Redirect</title>
+  <script>
+    // 쿼리에서 토큰 추출 후 localStorage에 저장하고 메인 페이지로 이동
+    window.onload = function () {
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get('accessToken');
+      localStorage.setItem('accessToken', 'test');
+      if (token) {
+        localStorage.setItem('accessToken', token);
+        // 필요하면 다른 정보도 저장
+      }
+      // 메인 페이지나 로그인 완료 페이지로 이동
+
+      window.location.href = `http://localhost:8081/oauth?accessToken=${token}`;
+    };
+  </script>
+</head>
+
+<body>
+  Redirecting...
+</body>
+
+</html>

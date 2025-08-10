@@ -87,7 +87,7 @@ export class AuthController {
   }
 
   //SECTION - OAuth 2.0
-  /*@Get('google')
+  @Get('google')
   @UseGuards(AuthGuard('google'))
   googleLogin() {
     this.logger.log(`누군가 Google Redirect 요청`);
@@ -99,44 +99,20 @@ export class AuthController {
     @Req() req: Request,
     @Res() res: Response,
   ): Promise<void> {
+    const appScheme = 'https://mory-backend-production.up.railway.app/public'; //mory://oauth
     const user = req.user as OAuthDTO;
     const existUser = await this.userService.findOne({ email: user.email });
 
     if (!existUser) {
       // Register flow
-      const redirectUrl = `exp://192.168.45.63//--/auth/google/redirect?status=register&email=${user.email}&name=${user.name}&provider=${user.provider}`;
+      const redirectUrl = `${appScheme}?status=register&email=${user.email}&name=${user.name}&provider=${user.provider}`;
       return res.redirect(redirectUrl);
     } else {
       // Login flow
       const tokenResponse = this.authService.vaildateOAuth(user, existUser);
-      const redirectUrl = `exp://192.168.45.63//--/auth/google/redirect?status=login&accessToken=${tokenResponse.accessToken}`;
+      const redirectUrl = `${appScheme}?status=login&accessToken=${tokenResponse.accessToken}`;
       return res.redirect(redirectUrl);
     }
-  }*/
-  @Get('google')
-  @UseGuards(AuthGuard('google'))
-  async googleLogin(): Promise<void> {}
-
-  @Get('google/redirect')
-  @UseGuards(AuthGuard('google'))
-  async googleLoginRedirect(@Req() req: Request): Promise<OAuthReturn> {
-    /* 
-      login : { status: 'login', value: JWT-String }
-      register : { status: 'register', value: OAuthDTO }
-    */
-    const user = req.user as OAuthDTO;
-    const existUser = await this.userService.findOne({ email: user.email });
-    if (!existUser) {
-      return {
-        status: 'register',
-        value: user,
-      };
-    }
-    const tokenResponse = this.authService.vaildateOAuth(user, existUser);
-    return {
-      status: 'login',
-      value: tokenResponse,
-    };
   }
 
   //SECTION - Mory
