@@ -87,7 +87,7 @@ export class AuthController {
   }
 
   //SECTION - OAuth 2.0
-  @Get('google')
+  /*@Get('google')
   @UseGuards(AuthGuard('google'))
   googleLogin() {
     this.logger.log(`누군가 Google Redirect 요청`);
@@ -112,6 +112,31 @@ export class AuthController {
       const redirectUrl = `exp://192.168.45.63//--/auth/google/redirect?status=login&accessToken=${tokenResponse.accessToken}`;
       return res.redirect(redirectUrl);
     }
+  }*/
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  async googleLogin(): Promise<void> {}
+
+  @Get('google/redirect')
+  @UseGuards(AuthGuard('google'))
+  async googleLoginRedirect(@Req() req: Request): Promise<OAuthReturn> {
+    /* 
+      login : { status: 'login', value: JWT-String }
+      register : { status: 'register', value: OAuthDTO }
+    */
+    const user = req.user as OAuthDTO;
+    const existUser = await this.userService.findOne({ email: user.email });
+    if (!existUser) {
+      return {
+        status: 'register',
+        value: user,
+      };
+    }
+    const tokenResponse = this.authService.vaildateOAuth(user, existUser);
+    return {
+      status: 'login',
+      value: tokenResponse,
+    };
   }
 
   //SECTION - Mory
