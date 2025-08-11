@@ -14,6 +14,7 @@ import { MonthlyAnalysisModule } from './monthly_analysis/monthly_analysis.modul
 import { MonthlyAnalysis } from './monthly_analysis/entity/monthly_analysis.entity';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { IntakeLogService } from './intake-log/intake-log.service';
 
 @Module({
   imports: [
@@ -38,6 +39,6 @@ import { join } from 'path';
     MonthlyAnalysisModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, IntakeLogService],
 })
 export class AppModule {}
