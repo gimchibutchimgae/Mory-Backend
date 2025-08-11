@@ -7,15 +7,20 @@
     // 쿼리에서 토큰 추출 후 localStorage에 저장하고 메인 페이지로 이동
     window.onload = function () {
       const params = new URLSearchParams(window.location.search);
-      const token = params.get('accessToken');
+      const status = params.get('status');
       localStorage.setItem('accessToken', 'test');
-      if (token) {
+      if (status === 'login') {
+        const token = params.get('accessToken');
         localStorage.setItem('accessToken', token);
+        window.location.href = `http://localhost:8081/oauth?status=login&accessToken=${token}`;
         // 필요하면 다른 정보도 저장
+      } else {
+        const email = params.get('email');
+        const name = params.get('name');
+        const provider = params.get('provider');
+        window.location.href = `http://localhost:8081/oauth?status=register&email=${email}&name=${name}&provider=${provider}`;
       }
-      // 메인 페이지나 로그인 완료 페이지로 이동
 
-      window.location.href = `http://localhost:8081/oauth?accessToken=${token}`;
     };
   </script>
 </head>

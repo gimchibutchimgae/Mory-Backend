@@ -99,7 +99,7 @@ export class AuthController {
     @Req() req: Request,
     @Res() res: Response,
   ): Promise<void> {
-    const appScheme = 'https://mory-backend-production.up.railway.app/public'; //mory://oauth
+    const appScheme = 'http://127.0.0.1:3000/public'; //mory://oauth
     const user = req.user as OAuthDTO;
     const existUser = await this.userService.findOne({ email: user.email });
 
